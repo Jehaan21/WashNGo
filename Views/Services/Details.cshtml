@@ -1,0 +1,166 @@
+@model WashNGo.Models.Service
+@{
+    ViewData["Title"] = Model.ServiceName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var reviews = Model.Reviews.Where(r => r.IsVisible).OrderByDescending(r => r.CreatedAt).ToList();
+    double avgRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+    var related = ViewBag.Related as List<WashNGo.Models.Service> ?? new();
+}
+
+<section class="py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Services" asp-action="Index">Services</a></li>
+                <li class="breadcrumb-item active">@Model.ServiceName</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5">
+            <!-- Left: Service Info -->
+            <div class="col-lg-8">
+                <div class="form-card mb-4">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                        <div>
+                            <span class="service-badge badge-@Model.VehicleType.ToLower() mb-2">@Model.VehicleType</span>
+                            <h1 style="font-size:2rem;font-weight:800;">@Model.ServiceName</h1>
+                        </div>
+                        <div class="text-end">
+                            <div class="service-price" style="font-size:2rem;">৳@Model.Price.ToString("N0")</div>
+                            <small class="text-muted">per wash</small>
+                        </div>
+                    </div>
+
+                    <!-- Service image placeholder -->
+                    <div style="height:280px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:5rem;margin-bottom:1.5rem;">
+                        @(Model.VehicleType == "Bike" ? "🏍️" : "🚗")
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 rounded-3" style="background:var(--light-gray);">
+                                <div style="font-size:1.5rem;">⏱️</div>
+                                <div class="fw-bold mt-1">@Model.DurationMinutes min</div>
+                                <small class="text-muted">Duration</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 rounded-3" style="background:var(--light-gray);">
+                                <div style="font-size:1.5rem;">⭐</div>
+                                <div class="fw-bold mt-1">@avgRating.ToString("F1")/5</div>
+                                <small class="text-muted">@reviews.Count reviews</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 rounded-3" style="background:var(--light-gray);">
+                                <div style="font-size:1.5rem;">@(Model.VehicleType == "Bike" ? "🏍️" : "🚗")</div>
+                                <div class="fw-bold mt-1">@Model.VehicleType</div>
+                                <small class="text-muted">Vehicle Type</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 rounded-3" style="background:var(--light-gray);">
+                                <div style="font-size:1.5rem;">✅</div>
+                                <div class="fw-bold mt-1 text-success">Available</div>
+                                <small class="text-muted">Status</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-2">About This Service</h5>
+                    <p class="text-muted">@Model.Description</p>
+                </div>
+
+                <!-- Reviews -->
+                <div class="form-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">Customer Reviews (@reviews.Count)</h5>
+                        <div class="stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= avgRating ? "fas" : "far") fa-star"></i>
+                            }
+                            <span class="text-muted ms-1" style="font-size:.9rem;">@avgRating.ToString("F1")</span>
+                        </div>
+                    </div>
+
+                    @if (!reviews.Any())
+                    {
+                        <div class="text-center py-4">
+                            <div style="font-size:3rem;">💬</div>
+                            <p class="text-muted mt-2">No reviews yet. Be the first to review!</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var r in reviews.Take(5))
+                        {
+                            <div class="review-card">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div class="fw-bold">@r.User?.Username</div>
+                                    <small class="text-muted">@r.CreatedAt.ToString("dd MMM yyyy")</small>
+                                </div>
+                                <div class="stars mb-2">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="@(i <= r.Rating ? "fas" : "far") fa-star" style="font-size:.85rem;"></i>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrEmpty(r.Comment))
+                                {
+                                    <p class="text-muted mb-0" style="font-size:.93rem;">@r.Comment</p>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Right: Booking card -->
+            <div class="col-lg-4">
+                <div class="form-card sticky-top" style="top:80px;">
+                    <h5 class="fw-bold mb-4">Book This Service</h5>
+                    <div class="service-price mb-1">৳@Model.Price.ToString("N0")</div>
+                    <p class="text-muted mb-4" style="font-size:.88rem;">Est. duration: @Model.DurationMinutes minutes</p>
+
+                    <a asp-controller="Booking" asp-action="Create" asp-route-serviceId="@Model.ServiceID"
+                       class="btn-primary-custom w-100 justify-content-center mb-3">
+                        <i class="fas fa-calendar-plus"></i> Book Appointment
+                    </a>
+                    <a asp-controller="Services" asp-action="Index"
+                       class="btn btn-outline-secondary w-100 rounded-pill">
+                        ← Back to Services
+                    </a>
+
+                    <hr class="my-4"/>
+                    <div class="d-flex flex-column gap-2" style="font-size:.88rem;">
+                        <div class="d-flex gap-2"><i class="fas fa-check text-success mt-1"></i><span>Trained professionals</span></div>
+                        <div class="d-flex gap-2"><i class="fas fa-check text-success mt-1"></i><span>Eco-friendly products</span></div>
+                        <div class="d-flex gap-2"><i class="fas fa-check text-success mt-1"></i><span>Satisfaction guaranteed</span></div>
+                        <div class="d-flex gap-2"><i class="fas fa-check text-success mt-1"></i><span>No hidden charges</span></div>
+                    </div>
+                </div>
+
+                @if (related.Any())
+                {
+                    <div class="form-card mt-4">
+                        <h6 class="fw-bold mb-3">Related Services</h6>
+                        @foreach (var rs in related)
+                        {
+                            <a asp-action="Details" asp-route-id="@rs.ServiceID"
+                               class="d-flex justify-content-between align-items-center p-2 rounded mb-2 text-decoration-none"
+                               style="border:1px solid var(--border);transition:.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                                <div>
+                                    <div class="fw-semibold" style="font-size:.9rem;">@rs.ServiceName</div>
+                                    <small class="text-muted">@rs.DurationMinutes min</small>
+                                </div>
+                                <div class="text-primary fw-bold">৳@rs.Price.ToString("N0")</div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

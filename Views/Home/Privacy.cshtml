@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:linear-gradient(135deg,var(--dark) 0%,var(--dark-2) 100%);padding:4rem 0 3rem;">
+    <div class="container text-center text-white">
+        <span class="hero-badge">🔒 Legal</span>
+        <h1 class="hero-title mt-2">Privacy Policy</h1>
+        <p class="hero-desc mx-auto">Last updated: @DateTime.Now.ToString("MMMM yyyy")</p>
+    </div>
+</section>
+
+<section style="background:var(--light-gray);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-card">
+
+                    <h5 class="fw-bold mb-3">1. Information We Collect</h5>
+                    <p class="text-muted mb-4">
+                        When you register or book a service on WashNGo, we collect your name, email address,
+                        phone number, and address. We also store your booking history and any reviews you submit.
+                        We do not collect payment card details — payments are handled on delivery or via third-party processors.
+                    </p>
+
+                    <h5 class="fw-bold mb-3">2. How We Use Your Information</h5>
+                    <p class="text-muted mb-4">
+                        Your information is used solely to manage your bookings, send service notifications,
+                        and improve our services. We do not sell, rent, or share your personal data with
+                        third parties for marketing purposes.
+                    </p>
+
+                    <h5 class="fw-bold mb-3">3. Data Security</h5>
+                    <p class="text-muted mb-4">
+                        Passwords are hashed using PBKDF2 with HMAC-SHA256 and a unique salt per user.
+                        All forms are protected against CSRF attacks. We use HTTPS to encrypt data in transit.
+                    </p>
+
+                    <h5 class="fw-bold mb-3">4. Cookies</h5>
+                    <p class="text-muted mb-4">
+                        We use a single authentication cookie to keep you logged in. This cookie is HttpOnly
+                        and expires after 8 hours of inactivity (or 30 days if you choose "Remember Me").
+                        No third-party tracking cookies are used.
+                    </p>
+
+                    <h5 class="fw-bold mb-3">5. Your Rights</h5>
+                    <p class="text-muted mb-4">
+                        You can update your profile information at any time from the Profile page.
+                        To request deletion of your account and data, contact us at
+                        <a href="mailto:info@washngo.com" class="text-primary">info@washngo.com</a>.
+                    </p>
+
+                    <h5 class="fw-bold mb-3">6. Contact</h5>
+                    <p class="text-muted mb-0">
+                        For any privacy concerns, email us at
+                        <a href="mailto:info@washngo.com" class="text-primary">info@washngo.com</a>
+                        or visit our <a asp-controller="Contact" asp-action="Index" class="text-primary">Contact page</a>.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

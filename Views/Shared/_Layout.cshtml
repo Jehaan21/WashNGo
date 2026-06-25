@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] – WashNGo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css"/>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            Wash<span>N</span>Go
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <i class="fas fa-bars text-white"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav mx-auto gap-1">
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+                       asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Services" ? "active" : "")"
+                       asp-controller="Services" asp-action="Index">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pricing" ? "active" : "")"
+                       asp-controller="Pricing" asp-action="Index">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Booking" ? "active" : "")"
+                       asp-controller="Booking" asp-action="Create">Booking</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "About" ? "active" : "")"
+                       asp-controller="Home" asp-action="About">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" ? "active" : "")"
+                       asp-controller="Contact" asp-action="Index">Contact</a>
+                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                }
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (!User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Booking" asp-action="MyBookings"
+                           class="nav-link d-none d-lg-inline-flex align-items-center gap-1">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>My Bookings</span>
+                        </a>
+                    }
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary text-white dropdown-toggle border-secondary"
+                                type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>@User.Identity.Name
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                <i class="fas fa-user me-2"></i>Profile</a></li>
+                            @if (!User.IsInRole("Admin"))
+                            {
+                                <li><a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings">
+                                    <i class="fas fa-calendar me-2"></i>My Bookings</a></li>
+                            }
+                            <li><hr class="dropdown-divider"/></li>
+                            <li>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login"
+                       class="nav-link d-none d-lg-inline-block">Login</a>
+                    <a asp-controller="Account" asp-action="Register"
+                       class="btn-book nav-link">Register</a>
+                }
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Toast Alerts ─────────────────────────────────────── -->
+@if (TempData["Success"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible alert-auto-dismiss d-flex align-items-center gap-2 shadow-sm" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span>@TempData["Success"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible alert-auto-dismiss d-flex align-items-center gap-2 shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>@TempData["Error"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+<!-- ── Page Content ──────────────────────────────────────── -->
+@RenderBody()
+
+<!-- ── Footer ────────────────────────────────────────────── -->
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="footer-brand mb-3">Wash<span>N</span>Go</div>
+                <p style="font-size:.92rem;line-height:1.7;">
+                    Professional vehicle wash and service management. Book your wash online, skip the queue,
+                    and drive away sparkling clean.
+                </p>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled" style="font-size:.92rem;">
+                    <li class="mb-2"><a asp-controller="Home"     asp-action="Index">Home</a></li>
+                    <li class="mb-2"><a asp-controller="Services" asp-action="Index">Services</a></li>
+                    <li class="mb-2"><a asp-controller="Pricing"  asp-action="Index">Pricing</a></li>
+                    <li class="mb-2"><a asp-controller="Booking"  asp-action="Create">Book Now</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h5>Company</h5>
+                <ul class="list-unstyled" style="font-size:.92rem;">
+                    <li class="mb-2"><a asp-controller="Home"    asp-action="About">About Us</a></li>
+                    <li class="mb-2"><a asp-controller="Contact" asp-action="Index">Contact</a></li>
+                    <li class="mb-2"><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                    <li class="mb-2"><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <h5>Contact Info</h5>
+                <ul class="list-unstyled" style="font-size:.92rem;">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt text-primary me-2"></i>Chittagong, Bangladesh</li>
+                    <li class="mb-2"><i class="fas fa-phone text-primary me-2"></i>+880 1700-000000</li>
+                    <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i>info&#64;washngo.com</li>
+                    <li class="mb-2"><i class="fas fa-clock text-primary me-2"></i>Sat–Thu: 9:00 AM – 9:00 PM</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="footer-divider"/>
+        <div class="d-flex flex-wrap justify-content-between align-items-center" style="font-size:.85rem;">
+            <span>&copy; @DateTime.Now.Year WashNGo. All rights reserved.</span>
+            <span>Built with <i class="fas fa-heart text-danger mx-1"></i>ASP.NET Core</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

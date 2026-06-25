@@ -1,0 +1,139 @@
+@* ── Booking/Create.cshtml ── *@
+@model WashNGo.ViewModels.BookingViewModel
+@{
+    ViewData["Title"] = "Book a Wash";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:linear-gradient(135deg,var(--dark) 0%,var(--dark-2) 100%);padding:3rem 0 2rem;">
+    <div class="container text-center text-white">
+        <h1 class="fw-800" style="font-size:2.2rem;font-weight:800;">Book Your Wash</h1>
+        <p style="opacity:.8;">Fill in the details below to reserve your slot.</p>
+    </div>
+</section>
+
+<section style="background:var(--light-gray);">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-7">
+                <form asp-action="Create" method="post" class="form-card">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+                    <!-- Step 1: Service -->
+                    <div class="booking-step mb-4">
+                        <div class="step-number">1</div>
+                        <h5 class="fw-bold mb-0">Select Service</h5>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label asp-for="ServiceID" class="form-label">Wash Service</label>
+                            <select asp-for="ServiceID" class="form-select" id="ServiceID" onchange="updateBookingSummary()">
+                                <option value="">-- Select a service --</option>
+                                @foreach (var s in Model.Services)
+                                {
+                                    <option value="@s.ServiceID" data-price="@s.Price" data-duration="@s.DurationMinutes">
+                                        @s.ServiceName – ৳@s.Price.ToString("N0")
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="ServiceID" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="VehicleType" class="form-label">Vehicle</label>
+                            <select asp-for="VehicleType" class="form-select" id="VehicleType" onchange="updateBookingSummary()">
+                                <option value="">-- Select --</option>
+                                <option value="Bike">🏍️ Bike</option>
+                                <option value="Car">🚗 Car</option>
+                            </select>
+                            <span asp-validation-for="VehicleType" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Date -->
+                    <div class="booking-step mb-4">
+                        <div class="step-number">2</div>
+                        <h5 class="fw-bold mb-0">Choose Date</h5>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="BookingDate" class="form-label">Booking Date</label>
+                        <input asp-for="BookingDate" type="date" class="form-control" id="BookingDate" onchange="updateBookingSummary()" />
+                        <span asp-validation-for="BookingDate" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Step 3: Time Slot -->
+                    <div class="booking-step mb-4">
+                        <div class="step-number">3</div>
+                        <h5 class="fw-bold mb-0">Pick a Time Slot</h5>
+                    </div>
+                    <input type="hidden" asp-for="SlotID" id="SlotID" />
+                    <div class="row g-2 mb-2" id="slotsGrid">
+                        <p class="text-muted col-12"><i class="fas fa-info-circle me-1"></i>Select a date above to see available slots.</p>
+                    </div>
+                    <div id="noSlotsMsg" class="alert alert-warning d-none mb-3" style="border-radius:10px;">
+                        <i class="fas fa-calendar-times me-2"></i>
+                        <strong>No slots available</strong> on this day. Please choose a different date.
+                    </div>
+                    <span asp-validation-for="SlotID" class="text-danger small d-block mb-3"></span>
+
+                    <!-- Step 4: Details -->
+                    <div class="booking-step mb-4">
+                        <div class="step-number">4</div>
+                        <h5 class="fw-bold mb-0">Your Details</h5>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            <input class="form-control" value="@Model.Username" readonly style="background:#f8fafc;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input class="form-control" value="@Model.Email" readonly style="background:#f8fafc;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input class="form-control" value="@Model.PhoneNumber" readonly style="background:#f8fafc;"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="VehicleNumber" class="form-label">Vehicle No. (Optional)</label>
+                            <input asp-for="VehicleNumber" class="form-control" placeholder="e.g. Dhaka Metro-Ga-11-1234"/>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="PaymentMethod" class="form-label">Payment Method</label>
+                            <select asp-for="PaymentMethod" class="form-select">
+                                <option value="Cash on Service">💵 Cash on Service</option>
+                                <option value="Online Payment">💳 Online Payment</option>
+                                <option value="bKash">📱 bKash</option>
+                                <option value="Nagad">📱 Nagad</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Notes" class="form-label">Special Instructions</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Any special requests…"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary-custom w-100 justify-content-center py-3" style="font-size:1.05rem;">
+                        <i class="fas fa-calendar-check me-2"></i>Confirm Booking
+                    </button>
+                </form>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="col-lg-4">
+                <div class="form-card sticky-top" style="top:80px;">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-receipt me-2 text-primary"></i>Booking Summary</h5>
+                    <div id="bookingSummary">
+                        <p class="text-muted">Select your service, date, and time slot to see a summary.</p>
+                    </div>
+                    <hr/>
+                    <div class="d-flex flex-column gap-2 mt-3" style="font-size:.87rem;">
+                        <div class="d-flex gap-2"><i class="fas fa-shield-alt text-success mt-1"></i><span>Secure & encrypted booking</span></div>
+                        <div class="d-flex gap-2"><i class="fas fa-undo text-success mt-1"></i><span>Free cancellation anytime</span></div>
+                        <div class="d-flex gap-2"><i class="fas fa-bell text-success mt-1"></i><span>Instant booking confirmation</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

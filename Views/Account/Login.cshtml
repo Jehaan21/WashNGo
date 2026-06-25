@@ -1,0 +1,316 @@
+@model WashNGo.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign In – WashNGo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+    --navy:#071739; --navy-2:#0d2150; --white:#ffffff;
+    --gray:#F5F7FA; --accent:#1E90FF; --accent-dark:#1271d4;
+    --text-muted:#64748b; --border:#e6eaf0;
+}
+*{box-sizing:border-box;}
+body{
+    font-family:'Inter',sans-serif; margin:0; min-height:100vh;
+    background:var(--gray); overflow-x:hidden;
+}
+.auth-wrap{ display:flex; min-height:100vh; }
+
+/* ───── LEFT SIDE ───── */
+.auth-left{
+    flex:1.05; position:relative; background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 55%,#143a7a 100%);
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:48px 56px; color:#fff; overflow:hidden;
+}
+.auth-left::before{
+    content:''; position:absolute; width:600px; height:600px; border-radius:50%;
+    background:radial-gradient(circle, rgba(30,144,255,.18), transparent 70%);
+    top:-200px; right:-200px;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-size:1.5rem; font-weight:800; position:relative; z-index:2;}
+.brand span{ color:var(--accent); }
+.brand .badge-n{ background:var(--accent); color:#fff; border-radius:8px; padding:2px 8px; }
+
+.illu-zone{ position:relative; flex:1; display:flex; align-items:center; justify-content:center; z-index:2; }
+.car-illu{
+    width:100%; max-width:460px; filter:drop-shadow(0 30px 60px rgba(0,0,0,.45));
+    animation:float 5s ease-in-out infinite;
+}
+@@keyframes float{ 0%,100%{transform:translateY(0px);} 50%{transform:translateY(-14px);} }
+
+.float-card{
+    position:absolute; background:rgba(255,255,255,.10);
+    backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.18);
+    border-radius:16px; padding:14px 18px; color:#fff; font-size:.85rem;
+    box-shadow:0 12px 32px rgba(0,0,0,.25); display:flex; align-items:center; gap:10px;
+    animation:floatCard 4.5s ease-in-out infinite;
+}
+.float-card .ic{ font-size:1.3rem; }
+.float-card.c1{ top:8%; left:0%; animation-delay:.2s; }
+.float-card.c2{ bottom:18%; right:0%; animation-delay:.8s; }
+.float-card.c3{ bottom:2%; left:8%; animation-delay:1.4s; }
+@@keyframes floatCard{ 0%,100%{transform:translateY(0px);} 50%{transform:translateY(-10px);} }
+.float-card .fc-title{ font-weight:700; }
+.float-card .fc-sub{ opacity:.75; font-size:.72rem; }
+
+.slogan-zone{ position:relative; z-index:2; }
+.slogan-zone h1{ font-size:2rem; font-weight:800; line-height:1.25; margin:0 0 8px; }
+.slogan-zone h1 span{ color:var(--accent); }
+.slogan-zone p{ opacity:.75; font-size:.95rem; margin:0; }
+
+/* ───── RIGHT SIDE ───── */
+.auth-right{
+    flex:1; display:flex; align-items:center; justify-content:center;
+    padding:40px 24px; background:var(--gray); position:relative;
+}
+.login-card{
+    width:100%; max-width:420px; background:rgba(255,255,255,.85);
+    backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,.6);
+    border-radius:24px; padding:42px 38px; box-shadow:0 20px 60px rgba(7,23,57,.10);
+    animation:cardIn .6s ease;
+}
+@@keyframes cardIn{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:translateY(0);} }
+
+.login-card h2{ font-weight:800; color:var(--navy); margin:0 0 4px; font-size:1.6rem; }
+.login-card .sub{ color:var(--text-muted); font-size:.92rem; margin-bottom:28px; }
+
+.f-group{ margin-bottom:18px; }
+.f-label{ font-weight:600; font-size:.85rem; color:var(--navy); margin-bottom:6px; display:block; }
+.f-input-wrap{ position:relative; }
+.f-input-wrap i.f-icon{
+    position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    color:#94a3b8; font-size:.9rem;
+}
+.f-input{
+    width:100%; padding:13px 16px 13px 42px; border:1.5px solid var(--border);
+    border-radius:12px; font-size:.93rem; background:#fff; transition:.2s;
+}
+.f-input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 4px rgba(30,144,255,.12); }
+.toggle-eye{
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:#94a3b8; cursor:pointer; font-size:.9rem;
+}
+.row-between{ display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.chk{ display:flex; align-items:center; gap:7px; font-size:.85rem; color:var(--text-muted); }
+.chk input{ accent-color:var(--accent); width:15px; height:15px; }
+.fp-link{ color:var(--accent); font-weight:600; font-size:.85rem; text-decoration:none; }
+.fp-link:hover{ text-decoration:underline; }
+
+.btn-signin{
+    width:100%; background:var(--accent); color:#fff; border:none; border-radius:12px;
+    padding:14px; font-weight:700; font-size:.96rem; cursor:pointer; transition:.2s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-signin:hover{ background:var(--accent-dark); transform:translateY(-1px); box-shadow:0 8px 20px rgba(30,144,255,.35); }
+.btn-signin:disabled{ opacity:.7; cursor:not-allowed; transform:none; }
+.spinner{
+    width:16px; height:16px; border:2.5px solid rgba(255,255,255,.4);
+    border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none;
+}
+@@keyframes spin{ to{transform:rotate(360deg);} }
+
+.divider{ display:flex; align-items:center; gap:12px; margin:26px 0; color:#94a3b8; font-size:.8rem; }
+.divider::before,.divider::after{ content:''; flex:1; height:1px; background:var(--border); }
+
+.social-row{ display:flex; flex-direction:column; gap:10px; }
+.social-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:12px; border:1.5px solid var(--border); border-radius:12px;
+    background:#fff; font-weight:600; font-size:.88rem; color:var(--navy);
+    cursor:pointer; transition:.2s; text-decoration:none;
+}
+.social-btn:hover{ border-color:#cbd5e1; background:#fafbfc; transform:translateY(-1px); }
+.social-btn img{ width:18px; height:18px; }
+
+.bottom-link{ text-align:center; margin-top:26px; font-size:.88rem; color:var(--text-muted); }
+.bottom-link a{ color:var(--accent); font-weight:700; text-decoration:none; }
+
+.alert-top{
+    border-radius:12px; padding:12px 16px; margin-bottom:18px; font-size:.85rem;
+    display:flex; align-items:center; gap:8px;
+}
+.alert-top.danger{ background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
+.alert-top.success{ background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
+
+/* Dark mode */
+.dark-toggle{
+    position:absolute; top:24px; right:24px; background:rgba(255,255,255,.7); border:1px solid var(--border);
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--navy); z-index:5; transition:.2s;
+}
+body.dark{ background:#0b1224; }
+body.dark .auth-right{ background:#0b1224; }
+body.dark .login-card{ background:rgba(15,23,42,.85); border-color:rgba(255,255,255,.08); }
+body.dark .login-card h2{ color:#fff; }
+body.dark .f-label{ color:#e2e8f0; }
+body.dark .f-input{ background:#1e293b; border-color:#334155; color:#fff; }
+body.dark .social-btn{ background:#1e293b; border-color:#334155; color:#fff; }
+body.dark .dark-toggle{ background:#1e293b; color:#fbbf24; border-color:#334155; }
+body.dark .bottom-link{ color:#94a3b8; }
+
+@@media (max-width:900px){
+    .auth-left{ display:none; }
+    .auth-right{ padding:24px 16px; }
+}
+</style>
+</head>
+<body>
+
+<button class="dark-toggle" onclick="toggleDark()"><i class="fas fa-moon" id="darkIcon"></i></button>
+
+<div class="auth-wrap">
+
+    <!-- LEFT -->
+    <div class="auth-left">
+        <div class="brand">Wash<span>N</span>Go <span class="badge-n">🚗</span></div>
+
+        <div class="illu-zone">
+            <svg class="car-illu" viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="250" cy="290" rx="190" ry="18" fill="#000" opacity=".25"/>
+                <g>
+                    <path d="M70 210 Q90 130 180 120 L320 120 Q400 130 430 210 L430 240 Q430 255 415 255 L85 255 Q70 255 70 240 Z" fill="#1E90FF"/>
+                    <path d="M150 125 Q180 90 250 90 Q320 90 350 125 L335 150 L165 150 Z" fill="#7fc4ff"/>
+                    <circle cx="150" cy="255" r="32" fill="#0d1b2a"/>
+                    <circle cx="150" cy="255" r="14" fill="#cfd8e3"/>
+                    <circle cx="350" cy="255" r="32" fill="#0d1b2a"/>
+                    <circle cx="350" cy="255" r="14" fill="#cfd8e3"/>
+                    <rect x="95" y="195" width="310" height="14" rx="7" fill="#ffffff" opacity=".35"/>
+                </g>
+                <g opacity=".9">
+                    <circle cx="120" cy="80" r="4" fill="#bfe3ff"><animate attributeName="cy" values="80;40;80" dur="2.4s" repeatCount="indefinite"/></circle>
+                    <circle cx="160" cy="60" r="3" fill="#bfe3ff"><animate attributeName="cy" values="60;20;60" dur="2.1s" repeatCount="indefinite"/></circle>
+                    <circle cx="380" cy="80" r="4" fill="#bfe3ff"><animate attributeName="cy" values="80;40;80" dur="2.6s" repeatCount="indefinite"/></circle>
+                </g>
+            </svg>
+
+            <div class="float-card c1">
+                <span class="ic">⭐</span>
+                <div><div class="fc-title">4.9 Rating</div><div class="fc-sub">2,500+ reviews</div></div>
+            </div>
+            <div class="float-card c2">
+                <span class="ic">👥</span>
+                <div><div class="fc-title">10,000+</div><div class="fc-sub">Happy Customers</div></div>
+            </div>
+            <div class="float-card c3">
+                <span class="ic">⚡</span>
+                <div><div class="fc-title">Express Wash</div><div class="fc-sub">In just 30 minutes</div></div>
+            </div>
+        </div>
+
+        <div class="slogan-zone">
+            <h1>Smart Car Care, <span>Anytime</span></h1>
+            <p>Book your wash, track your booking, drive away spotless.</p>
+        </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="auth-right">
+        <div class="login-card">
+            <h2>Welcome Back 👋</h2>
+            <p class="sub">Sign in to book your next wash</p>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert-top success"><i class="fas fa-check-circle"></i><span>@TempData["Success"]</span></div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert-top danger"><i class="fas fa-exclamation-circle"></i><span>@TempData["Error"]</span></div>
+            }
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert-top danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>@Html.ValidationSummary(false, null, new { @class = "m-0 p-0" })</span>
+                </div>
+            }
+
+            <form asp-action="Login" method="post" id="loginForm">
+                @Html.AntiForgeryToken()
+
+                <div class="f-group">
+                    <label class="f-label">Email Address</label>
+                    <div class="f-input-wrap">
+                        <i class="fas fa-envelope f-icon"></i>
+                        <input asp-for="Email" class="f-input" placeholder="you@example.com"/>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="f-group">
+                    <label class="f-label">Password</label>
+                    <div class="f-input-wrap">
+                        <i class="fas fa-lock f-icon"></i>
+                        <input asp-for="Password" id="pwdInput" class="f-input" placeholder="Your password" style="padding-right:42px;"/>
+                        <button type="button" class="toggle-eye" onclick="togglePwd()"><i class="fas fa-eye" id="eyeIcon"></i></button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="row-between">
+                    <label class="chk"><input asp-for="RememberMe" type="checkbox"/> Remember Me</label>
+                    <a asp-action="ForgotPassword" class="fp-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-signin" id="signinBtn">
+                    <span class="spinner" id="spinner"></span>
+                    <span id="btnText">Sign In</span>
+                </button>
+            </form>
+
+            <div class="divider">Or continue with</div>
+
+            <div class="social-row">
+                <a asp-action="ExternalLogin" asp-controller="Account" asp-route-provider="Google" class="social-btn">
+                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.4 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 13.9-5.1l-6.4-5.4C29.4 36.5 26.8 37.5 24 37.5c-5.2 0-9.6-3.3-11.2-7.9l-6.6 5.1C9.6 40.5 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.4 5.4C40.9 36.3 44 30.7 44 24c0-1.2-.1-2.4-.4-3.5z"/></svg>
+                    Continue with Google
+                </a>
+                <a asp-action="ExternalLogin" asp-controller="Account" asp-route-provider="Facebook" class="social-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M22 12c0-5.5-4.5-10-10-10S2 6.5 2 12c0 5 3.7 9.1 8.4 9.9v-7H7.9v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v1.9h2.8l-.4 2.9h-2.4v7C18.3 21.1 22 17 22 12z"/></svg>
+                    Continue with Facebook
+                </a>
+                <a href="#" class="social-btn" style="opacity:.55;cursor:not-allowed;" onclick="alert('Apple Sign-In is coming soon!'); return false;" title="Coming soon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.07-2.383 1.4-2.383 4.05 0 2.99 2.514 4.073 2.954 4.583z"/></svg>
+                    Continue with Apple
+                </a>
+            </div>
+
+            <div class="bottom-link">
+                Don't have an account? <a asp-action="Register">Create Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_ValidationScriptsPartial")
+<script>
+function togglePwd(){
+    const inp = document.getElementById('pwdInput');
+    const icon = document.getElementById('eyeIcon');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
+}
+function toggleDark(){
+    document.body.classList.toggle('dark');
+    const icon = document.getElementById('darkIcon');
+    icon.classList.toggle('fa-moon'); icon.classList.toggle('fa-sun');
+}
+document.getElementById('loginForm').addEventListener('submit', function(){
+    const btn = document.getElementById('signinBtn');
+    document.getElementById('spinner').style.display = 'inline-block';
+    document.getElementById('btnText').textContent = 'Signing in...';
+    btn.disabled = true;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+@* ── Booking/Confirmation.cshtml ── *@
+@model WashNGo.ViewModels.BookingConfirmationViewModel
+@{
+    ViewData["Title"] = "Booking Confirmed";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:var(--light-gray);" class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="confirmation-card">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h2 class="fw-bold mb-1">Booking Confirmed!</h2>
+                    <p class="text-muted mb-4">Your reservation has been received. Show up at your slot and we'll take care of the rest.</p>
+
+                    <div class="reservation-id mb-4">@Model.ReservationID</div>
+
+                    <table class="booking-summary-table w-100 mb-4 text-start">
+                        <tr><td>Service</td><td>@Model.ServiceName</td></tr>
+                        <tr><td>Vehicle Type</td><td>@Model.VehicleType</td></tr>
+                        <tr><td>Date</td><td>@Model.BookingDate.ToString("dddd, dd MMMM yyyy")</td></tr>
+                        <tr><td>Time Slot</td><td>@Model.SlotLabel</td></tr>
+                        <tr><td>Duration</td><td>~@Model.Duration minutes</td></tr>
+                        <tr><td>Payment</td><td>@Model.PaymentMethod</td></tr>
+                        <tr>
+                            <td>Status</td>
+                            <td><span class="status-badge status-pending">@Model.BookingStatus</span></td>
+                        </tr>
+                        <tr>
+                            <td>Total Amount</td>
+                            <td class="text-primary fw-bold" style="font-size:1.2rem;">৳@Model.TotalAmount.ToString("N0")</td>
+                        </tr>
+                    </table>
+
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a asp-controller="Booking" asp-action="MyBookings" class="btn-primary-custom">
+                            <i class="fas fa-calendar-alt me-2"></i>My Bookings
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4 rounded-pill">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── END Confirmation ── *@

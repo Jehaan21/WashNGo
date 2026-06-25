@@ -1,0 +1,91 @@
+@model WashNGo.ViewModels.ContactViewModel
+@{
+    ViewData["Title"] = "Contact Us";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:linear-gradient(135deg,var(--dark) 0%,var(--dark-2) 100%);padding:4rem 0 3rem;">
+    <div class="container text-center text-white">
+        <span class="hero-badge">📞 Contact</span>
+        <h1 class="hero-title mt-2">Get In Touch</h1>
+        <p class="hero-desc mx-auto">Have a question or feedback? We'd love to hear from you.</p>
+    </div>
+</section>
+
+<section style="background:var(--light-gray);">
+    <div class="container">
+        <div class="row g-5">
+
+            <!-- Contact Info -->
+            <div class="col-lg-4">
+                <h4 class="fw-bold mb-4">Contact Information</h4>
+                @foreach (var info in new[] {
+                    ("fas fa-map-marker-alt","Address","Agrabad, Chittagong, Bangladesh"),
+                    ("fas fa-phone","Phone","+880 1700-000000"),
+                    ("fas fa-envelope","Email","info@washngo.com"),
+                    ("fas fa-clock","Working Hours","Sat–Thu: 9:00 AM – 9:00 PM\nFri: Closed")
+                })
+                {
+                    <div class="d-flex gap-3 mb-4">
+                        <div style="width:48px;height:48px;background:rgba(14,165,233,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="@info.Item1 text-primary"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold mb-1">@info.Item2</div>
+                            <div class="text-muted" style="font-size:.9rem;white-space:pre-line;">@info.Item3</div>
+                        </div>
+                    </div>
+                }
+
+                <div class="mt-4 p-4 rounded-3" style="background:var(--primary);color:white;">
+                    <h6 class="fw-bold mb-2">Emergency / Urgent?</h6>
+                    <p style="font-size:.9rem;opacity:.9;margin-bottom:.5rem;">Call us directly:</p>
+                    <a href="tel:+8801700000000" style="color:white;font-weight:700;font-size:1.1rem;">+880 1700-000000</a>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <h4 class="fw-bold mb-4">Send a Message</h4>
+                    <form asp-action="Index" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label">Your Name</label>
+                                <input asp-for="Name" class="form-control" placeholder="John Doe"/>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">Email Address</label>
+                                <input asp-for="Email" class="form-control" placeholder="you@example.com"/>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Subject" class="form-label">Subject</label>
+                                <input asp-for="Subject" class="form-control" placeholder="What's this about?"/>
+                                <span asp-validation-for="Subject" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Message" class="form-label">Message</label>
+                                <textarea asp-for="Message" class="form-control" rows="6" placeholder="Write your message here…"></textarea>
+                                <span asp-validation-for="Message" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary-custom w-100 justify-content-center py-3 mt-4">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

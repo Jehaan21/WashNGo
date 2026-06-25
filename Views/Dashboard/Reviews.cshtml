@@ -1,0 +1,76 @@
+@* ── Dashboard/Reviews.cshtml ── *@
+@model IEnumerable<WashNGo.Models.Review>
+@{
+    ViewData["Title"] = "Reviews";
+    Layout = "~/Views/Dashboard/_DashboardLayout.cshtml";
+}
+
+<h5 class="fw-bold mb-4">Customer Reviews</h5>
+
+<div class="bg-white rounded-3 shadow-sm border overflow-hidden">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Service</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Date</th>
+                <th>Visible</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="7" class="text-center text-muted py-4">No reviews yet.</td></tr>
+            }
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@r.User?.Username</td>
+                    <td style="font-size:.9rem;">@r.Service?.ServiceName</td>
+                    <td>
+                        <div class="stars" style="font-size:.85rem;">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="@(i <= r.Rating ? "fas" : "far") fa-star"></i>
+                            }
+                        </div>
+                    </td>
+                    <td style="font-size:.88rem;max-width:200px;">
+                        <span style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                            @(r.Comment ?? "–")
+                        </span>
+                    </td>
+                    <td style="font-size:.88rem;">@r.CreatedAt.ToString("dd MMM yyyy")</td>
+                    <td>
+                        @if (r.IsVisible)
+                        {
+                            <span class="status-badge status-confirmed">Visible</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-cancelled">Hidden</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <form asp-action="ToggleReview" asp-route-id="@r.ReviewID" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-2">
+                                    @(r.IsVisible ? "Hide" : "Show")
+                                </button>
+                            </form>
+                            <form asp-action="DeleteReview" asp-route-id="@r.ReviewID" method="post" class="m-0"
+                                  onsubmit="return confirm('Delete this review?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

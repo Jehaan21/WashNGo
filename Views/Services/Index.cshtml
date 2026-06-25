@@ -1,0 +1,88 @@
+@* ── Services/Index.cshtml ── *@
+@model IEnumerable<WashNGo.Models.Service>
+@{
+    ViewData["Title"] = "Services";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:linear-gradient(135deg,var(--dark) 0%,var(--dark-2) 100%);padding:4rem 0 3rem;">
+    <div class="container text-center text-white">
+        <span class="hero-badge">🚿 Services</span>
+        <h1 class="hero-title mt-2">Our Wash Packages</h1>
+        <p class="hero-desc mx-auto">Professional bike and car wash services for every need and budget.</p>
+    </div>
+</section>
+
+<section style="background:var(--light-gray);">
+    <div class="container">
+        <!-- Filters -->
+        <form method="get" class="row g-3 mb-5 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-600">Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Search services…"
+                       value="@ViewBag.Search"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600">Vehicle Type</label>
+                <select name="vehicleType" class="form-select">
+                    <option value="All" selected="@(ViewBag.VehicleType == null)">All Vehicles</option>
+                    <option value="Bike" selected="@(ViewBag.VehicleType == "Bike")">🏍️ Bike</option>
+                    <option value="Car"  selected="@(ViewBag.VehicleType == "Car")">🚗 Car</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600">Max Price (৳)</label>
+                <input type="number" name="maxPrice" class="form-control" placeholder="e.g. 500"
+                       value="@ViewBag.MaxPrice"/>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-primary-custom w-100 justify-content-center">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+            </div>
+        </form>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <div style="font-size:4rem;">🔍</div>
+                <h4 class="mt-3">No services found</h4>
+                <p class="text-muted">Try adjusting your filters.</p>
+                <a asp-action="Index" class="btn-primary-custom mt-2">Clear Filters</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var s in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="service-card">
+                            <div class="service-card-img-placeholder">
+                                @(s.VehicleType == "Bike" ? "🏍️" : s.VehicleType == "Car" ? "🚗" : "🚿")
+                            </div>
+                            <div class="service-card-body">
+                                <span class="service-badge badge-@s.VehicleType.ToLower()">@s.VehicleType</span>
+                                <div class="service-name">@s.ServiceName</div>
+                                <div class="service-desc">@s.Description</div>
+                                <div class="service-meta">
+                                    <span><i class="fas fa-clock me-1"></i>@s.DurationMinutes min</span>
+                                    <span class="text-success"><i class="fas fa-check-circle me-1"></i>Available</span>
+                                </div>
+                                <div class="service-footer">
+                                    <div class="service-price">৳@s.Price.ToString("N0")</div>
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Details" asp-route-id="@s.ServiceID"
+                                           class="btn btn-sm btn-outline-primary rounded-pill px-3">Details</a>
+                                        <a asp-controller="Booking" asp-action="Create" asp-route-serviceId="@s.ServiceID"
+                                           class="btn btn-sm btn-primary rounded-pill px-3">Book</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

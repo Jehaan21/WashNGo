@@ -1,0 +1,146 @@
+@model IEnumerable<WashNGo.Models.Service>
+@{
+    ViewData["Title"] = "Pricing";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var bikeServices = Model.Where(s => s.VehicleType == "Bike" || s.VehicleType == "Both").ToList();
+    var carServices  = Model.Where(s => s.VehicleType == "Car"  || s.VehicleType == "Both").ToList();
+}
+
+<section style="background:linear-gradient(135deg,var(--dark) 0%,var(--dark-2) 100%);padding:4rem 0 3rem;">
+    <div class="container text-center text-white">
+        <span class="hero-badge">💰 Pricing</span>
+        <h1 class="hero-title mt-2">Simple, Transparent Pricing</h1>
+        <p class="hero-desc mx-auto">No hidden fees. No surprises. Just clean vehicles at fair prices.</p>
+    </div>
+</section>
+
+<section style="background:var(--light-gray);">
+    <div class="container">
+
+        <!-- Bike Packages -->
+        <div class="mb-5">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div style="font-size:2rem;">🏍️</div>
+                <div>
+                    <span class="section-tag">Bike Services</span>
+                    <h3 class="fw-bold mb-0">Bike Wash Packages</h3>
+                </div>
+            </div>
+            <div class="row g-4">
+                @foreach (var s in bikeServices)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pricing-card @(s.ServiceName.Contains("Premium") ? "featured" : "")">
+                            @if (s.ServiceName.Contains("Premium"))
+                            {
+                                <div class="mb-3">
+                                    <span class="badge" style="background:var(--secondary);font-size:.8rem;padding:.4rem .8rem;border-radius:20px;">⭐ Most Popular</span>
+                                </div>
+                            }
+                            <div style="font-size:2.5rem;margin-bottom:.75rem;">🏍️</div>
+                            <h5 class="fw-bold mb-2">@s.ServiceName</h5>
+                            <p class="text-muted mb-3" style="font-size:.9rem;">@s.Description</p>
+                            <div class="pricing-price mb-1">৳@s.Price.ToString("N0")</div>
+                            <small class="text-muted d-block mb-3">per wash · ~@s.DurationMinutes min</small>
+                            <a asp-controller="Booking" asp-action="Create" asp-route-serviceId="@s.ServiceID"
+                               class="btn-primary-custom w-100 justify-content-center">
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Car Packages -->
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div style="font-size:2rem;">🚗</div>
+                <div>
+                    <span class="section-tag">Car Services</span>
+                    <h3 class="fw-bold mb-0">Car Wash Packages</h3>
+                </div>
+            </div>
+            <div class="row g-4">
+                @foreach (var s in carServices)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="pricing-card @(s.ServiceName.Contains("Premium") ? "featured" : "")">
+                            @if (s.ServiceName.Contains("Premium"))
+                            {
+                                <div class="mb-3">
+                                    <span class="badge" style="background:var(--secondary);font-size:.8rem;padding:.4rem .8rem;border-radius:20px;">⭐ Most Popular</span>
+                                </div>
+                            }
+                            <div style="font-size:2.5rem;margin-bottom:.75rem;">🚗</div>
+                            <h5 class="fw-bold mb-2">@s.ServiceName</h5>
+                            <p class="text-muted mb-3" style="font-size:.9rem;">@s.Description</p>
+                            <div class="pricing-price mb-1">৳@s.Price.ToString("N0")</div>
+                            <small class="text-muted d-block mb-3">per wash · ~@s.DurationMinutes min</small>
+                            <a asp-controller="Booking" asp-action="Create" asp-route-serviceId="@s.ServiceID"
+                               class="btn-primary-custom w-100 justify-content-center">
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="mt-5 form-card">
+            <h4 class="fw-bold mb-4 text-center">Quick Comparison</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle" style="font-size:.9rem;">
+                    <thead style="background:var(--light-gray);">
+                        <tr>
+                            <th class="text-start">Feature</th>
+                            <th>Basic Wash</th>
+                            <th>Premium Wash</th>
+                            <th>Interior Clean</th>
+                            <th>Wax Polish</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in new[] {
+                            ("Exterior Wash",       "✅","✅","✅","✅"),
+                            ("Foam Cannon",         "❌","✅","❌","✅"),
+                            ("Interior Vacuum",     "❌","❌","✅","❌"),
+                            ("Dashboard Wipe",      "❌","❌","✅","❌"),
+                            ("Wax Polish",          "❌","❌","❌","✅"),
+                            ("Tire Shine",          "❌","✅","❌","✅"),
+                            ("Chain Lube (Bike)",   "❌","✅","N/A","N/A"),
+                            ("Air Freshener",       "❌","❌","✅","❌"),
+                        })
+                        {
+                            <tr>
+                                <td class="text-start fw-semibold">@row.Item1</td>
+                                <td>@row.Item2</td>
+                                <td>@row.Item3</td>
+                                <td>@row.Item4</td>
+                                <td>@row.Item5</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);" class="py-5">
+    <div class="container text-center text-white">
+        <h2 class="fw-bold mb-3" style="font-size:2rem;">Not sure which package to pick?</h2>
+        <p class="mb-4" style="opacity:.9;">Our team is happy to help you choose the right wash for your vehicle.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a asp-controller="Contact" asp-action="Index"
+               class="btn btn-light fw-bold px-5 py-3 rounded-pill" style="color:var(--primary-dark);">
+                <i class="fas fa-phone me-2"></i>Contact Us
+            </a>
+            <a asp-controller="Booking" asp-action="Create" class="btn-outline-custom">
+                <i class="fas fa-calendar-plus me-2"></i>Book Now
+            </a>
+        </div>
+    </div>
+</section>

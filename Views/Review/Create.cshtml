@@ -1,0 +1,58 @@
+@model WashNGo.ViewModels.ReviewViewModel
+@{
+    ViewData["Title"] = "Leave a Review";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:var(--light-gray);min-height:calc(100vh - 72px);" class="d-flex align-items-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-card">
+                    <div class="text-center mb-4">
+                        <div style="font-size:3rem;">⭐</div>
+                        <h3 class="fw-bold mt-2 mb-1">Leave a Review</h3>
+                        <p class="text-muted">Share your experience with <strong>@Model.ServiceName</strong></p>
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="BookingID"/>
+                        <input type="hidden" asp-for="ServiceID"/>
+                        <input type="hidden" asp-for="ServiceName"/>
+                        <input type="hidden" asp-for="Rating" id="Rating" value="0"/>
+
+                        <!-- Star Picker -->
+                        <div class="text-center mb-4">
+                            <label class="form-label d-block">Your Rating</label>
+                            <div class="d-flex justify-content-center gap-2" style="font-size:2.5rem;cursor:pointer;">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="far fa-star star-pick text-muted" data-value="@i" style="transition:.15s;"></i>
+                                }
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Comment" class="form-label">Your Review</label>
+                            <textarea asp-for="Comment" class="form-control" rows="5"
+                                      placeholder="Tell others about your experience — what did you love?"></textarea>
+                            <span asp-validation-for="Comment" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn-primary-custom w-100 justify-content-center py-3">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Review
+                        </button>
+                        <a asp-controller="Booking" asp-action="MyBookings"
+                           class="btn btn-outline-secondary w-100 rounded-pill mt-2">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,230 @@
+@model IEnumerable<WashNGo.Models.Service>
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var featured = ViewBag.FeaturedServices as List<WashNGo.Models.Service> ?? new();
+}
+
+<!-- ── Hero Slider ─────────────────────────────────────── -->
+<section class="hero-slider p-0">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4500">
+        <div class="carousel-inner">
+
+            <div class="carousel-item active">
+                <div class="hero-slide-bg" style="background: linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); display:flex; align-items:center;">
+                    <div class="hero-content">
+                        <span class="hero-badge">⭐ Premium Service</span>
+                        <h1 class="hero-title">Premium <span>Car Wash</span><br/>At Your Convenience</h1>
+                        <p class="hero-desc">Book your car wash online in 60 seconds. Choose your time slot, skip the queue, and drive away spotless.</p>
+                        <div class="hero-actions">
+                            <a asp-controller="Booking" asp-action="Create" class="btn-primary-custom">
+                                <i class="fas fa-calendar-plus"></i> Book Now
+                            </a>
+                            <a asp-controller="Services" asp-action="Index" class="btn-outline-custom">
+                                <i class="fas fa-th-large"></i> View Services
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="hero-slide-bg" style="background: linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%); display:flex; align-items:center;">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background:var(--secondary);">🏍️ Bike Special</span>
+                        <h1 class="hero-title">Bike <span style="color:var(--secondary);">Deep Cleaning</span><br/>Package Available</h1>
+                        <p class="hero-desc">Complete bike wash with chain lube, polish, and shine. From ৳150 only.</p>
+                        <div class="hero-actions">
+                            <a asp-controller="Booking" asp-action="Create" class="btn-primary-custom">
+                                <i class="fas fa-calendar-plus"></i> Book Bike Wash
+                            </a>
+                            <a asp-controller="Pricing" asp-action="Index" class="btn-outline-custom">
+                                <i class="fas fa-tags"></i> See Pricing
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="hero-slide-bg" style="background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); display:flex; align-items:center;">
+                    <div class="hero-content">
+                        <span class="hero-badge" style="background:#7c3aed;">✨ Interior Care</span>
+                        <h1 class="hero-title">Interior <span style="color:#a78bfa;">Deep Cleaning</span><br/>Like Brand New</h1>
+                        <p class="hero-desc">Full vacuum, dashboard wipe, seat cleaning & air freshener. Your car will feel brand new inside.</p>
+                        <div class="hero-actions">
+                            <a asp-controller="Booking" asp-action="Create" class="btn-primary-custom">
+                                <i class="fas fa-calendar-plus"></i> Schedule Wash
+                            </a>
+                            <a asp-controller="Services" asp-action="Details" asp-route-id="5" class="btn-outline-custom">
+                                <i class="fas fa-info-circle"></i> Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+        <div class="carousel-indicators" style="bottom:20px;">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+    </div>
+</section>
+
+<!-- ── Stats ─────────────────────────────────────────────── -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-number">2,500+</div>
+                <div class="stat-label">Happy Customers</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-number">8+</div>
+                <div class="stat-label">Wash Services</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Daily Time Slots</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-number">4.9★</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Featured Services ──────────────────────────────────── -->
+<section style="background: var(--light-gray);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">Our Services</span>
+            <h2 class="section-title">Professional Vehicle<br/>Wash Packages</h2>
+            <p class="section-sub">From a quick exterior rinse to a full premium detail — we've got you covered.</p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var s in featured)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="service-card">
+                        @if (!string.IsNullOrEmpty(s.ImageUrl))
+                        {
+                            <img src="@s.ImageUrl" class="service-card-img" alt="@s.ServiceName"
+                                 onerror="this.parentNode.querySelector('.service-card-img-placeholder').style.display='flex';this.style.display='none'"/>
+                        }
+                        <div class="service-card-img-placeholder" @(string.IsNullOrEmpty(s.ImageUrl) ? "" : "style='display:none'")>
+                            @(s.VehicleType == "Bike" ? "🏍️" : s.VehicleType == "Car" ? "🚗" : "🚿")
+                        </div>
+                        <div class="service-card-body">
+                            <span class="service-badge badge-@s.VehicleType.ToLower()">@s.VehicleType</span>
+                            <div class="service-name">@s.ServiceName</div>
+                            <div class="service-desc">@s.Description</div>
+                            <div class="service-meta">
+                                <span><i class="fas fa-clock me-1"></i>@s.DurationMinutes min</span>
+                                <span><i class="fas fa-check-circle me-1"></i>Available</span>
+                            </div>
+                            <div class="service-footer">
+                                <div class="service-price">৳@s.Price.ToString("N0") <small>/wash</small></div>
+                                <a asp-controller="Services" asp-action="Details" asp-route-id="@s.ServiceID"
+                                   class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-5">
+            <a asp-controller="Services" asp-action="Index" class="btn-primary-custom">
+                <i class="fas fa-th-large me-2"></i>View All Services
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ── How It Works ───────────────────────────────────────── -->
+<section>
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">Simple Process</span>
+            <h2 class="section-title">Book in 3 Easy Steps</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4 text-center">
+                <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.2rem;color:white;">1</div>
+                <h5 class="fw-bold mb-2">Choose Your Service</h5>
+                <p class="text-muted">Browse our bike and car wash packages, view prices, durations, and details.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--secondary),#ea6c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.2rem;color:white;">2</div>
+                <h5 class="fw-bold mb-2">Pick a Time Slot</h5>
+                <p class="text-muted">Select your preferred date and available time slot. Real-time availability shown.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--success),#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.2rem;color:white;">3</div>
+                <h5 class="fw-bold mb-2">Confirm & Show Up</h5>
+                <p class="text-muted">Get your booking ID, arrive at your scheduled time, and drive away clean!</p>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a asp-controller="Booking" asp-action="Create" class="btn-primary-custom btn-lg">
+                <i class="fas fa-calendar-plus me-2"></i>Book Your Wash Now
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ── Why Choose Us ──────────────────────────────────────── -->
+<section style="background:var(--light-gray);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">Why WashNGo</span>
+            <h2 class="section-title">The Smarter Way to Keep<br/>Your Vehicle Clean</h2>
+        </div>
+        <div class="row g-4">
+            @foreach (var f in new[] {
+                ("fa-bolt","Expert Team","Trained professionals with years of experience in vehicle care."),
+                ("fa-shield-alt","Safe Products","Eco-friendly, paint-safe cleaning solutions used on every wash."),
+                ("fa-clock","Save Time","Online booking means zero waiting. Your slot is reserved for you."),
+                ("fa-star","Guaranteed Quality","Not satisfied? We re-wash for free. Your satisfaction is our priority."),
+                ("fa-mobile-alt","Easy Booking","Book, reschedule or cancel from any device in seconds."),
+                ("fa-tag","Best Prices","Competitive pricing with packages for every budget.")
+            })
+            {
+                <div class="col-md-4 col-6">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas @f.Item1"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">@f.Item2</h6>
+                        <p class="text-muted mb-0" style="font-size:.88rem;">@f.Item3</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA Banner ────────────────────────────────────────── -->
+<section style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);" class="py-5">
+    <div class="container text-center text-white">
+        <h2 class="fw-800 mb-3" style="font-size:2rem;font-weight:800;">Ready for a Sparkling Clean Ride?</h2>
+        <p class="mb-4" style="opacity:.9;font-size:1.05rem;">Join thousands of satisfied customers. Book your wash today!</p>
+        <a asp-controller="Booking" asp-action="Create"
+           class="btn btn-light fw-bold px-5 py-3 rounded-pill" style="color:var(--primary-dark);">
+            <i class="fas fa-calendar-plus me-2"></i>Schedule Now — It's Free
+        </a>
+    </div>
+</section>

@@ -1,0 +1,55 @@
+@* ── Dashboard/Customers.cshtml ── *@
+@model IEnumerable<WashNGo.Models.User>
+@{
+    ViewData["Title"] = "Customers";
+    Layout = "~/Views/Dashboard/_DashboardLayout.cshtml";
+}
+
+<h5 class="fw-bold mb-4">Customer Accounts</h5>
+
+<div class="bg-white rounded-3 shadow-sm border overflow-hidden">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Registered</th>
+                <th>Last Login</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@u.Username</td>
+                    <td class="text-muted" style="font-size:.88rem;">@u.Email</td>
+                    <td>@u.PhoneNumber</td>
+                    <td style="font-size:.88rem;">@u.RegistrationDate.ToString("dd MMM yyyy")</td>
+                    <td style="font-size:.88rem;">@(u.LastLogin?.ToString("dd MMM yyyy HH:mm") ?? "–")</td>
+                    <td>
+                        @if (u.AccountStatus == "Active")
+                        {
+                            <span class="status-badge status-confirmed">Active</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-cancelled">Suspended</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="ToggleUserStatus" asp-route-id="@u.UserID" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                                    onclick="return confirm('@(u.AccountStatus == "Active" ? "Suspend" : "Activate") this user?')">
+                                @(u.AccountStatus == "Active" ? "Suspend" : "Activate")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

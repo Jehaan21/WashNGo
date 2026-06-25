@@ -1,0 +1,116 @@
+@model WashNGo.Models.Booking
+@{
+    ViewData["Title"] = "Booking Detail";
+    Layout = "~/Views/Dashboard/_DashboardLayout.cshtml";
+}
+
+<div class="mb-4">
+    <a asp-action="Bookings" class="text-muted text-decoration-none">
+        <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="bg-white rounded-3 shadow-sm border p-4">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        @(Model.ReservationID ?? $"WNG-{Model.BookingID:D6}")
+                    </h5>
+                    <small class="text-muted">Booked on @Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</small>
+                </div>
+                <span class="status-badge status-@Model.BookingStatus.ToLower().Replace(" ", "-")" style="font-size:.9rem;">
+                    @Model.BookingStatus
+                </span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3" style="background:var(--light-gray);">
+                        <small class="text-muted d-block mb-1">Customer</small>
+                        <div class="fw-bold">@Model.User?.Username</div>
+                        <div class="text-muted" style="font-size:.88rem;">@Model.User?.Email</div>
+                        <div class="text-muted" style="font-size:.88rem;">@Model.User?.PhoneNumber</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3" style="background:var(--light-gray);">
+                        <small class="text-muted d-block mb-1">Service</small>
+                        <div class="fw-bold">@Model.Service?.ServiceName</div>
+                        <div class="text-muted" style="font-size:.88rem;">Vehicle: @Model.VehicleType @Model.VehicleNumber</div>
+                        <div class="text-muted" style="font-size:.88rem;">Duration: ~@Model.Service?.DurationMinutes min</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3" style="background:var(--light-gray);">
+                        <small class="text-muted d-block mb-1">Schedule</small>
+                        <div class="fw-bold">@Model.BookingDate.ToString("dddd, dd MMM yyyy")</div>
+                        <div class="text-muted" style="font-size:.88rem;">@Model.Slot?.SlotLabel</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3" style="background:var(--light-gray);">
+                        <small class="text-muted d-block mb-1">Payment</small>
+                        <div class="fw-bold text-primary" style="font-size:1.2rem;">৳@Model.TotalAmount.ToString("N0")</div>
+                        <div class="text-muted" style="font-size:.88rem;">@Model.PaymentMethod</div>
+                        <div class="text-muted" style="font-size:.88rem;">@Model.PaymentStatus</div>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="p-3 rounded-3 border mb-4">
+                    <small class="text-muted d-block mb-1">Special Notes</small>
+                    <div>@Model.Notes</div>
+                </div>
+            }
+
+            <!-- Update Status -->
+            <div class="border-top pt-4">
+                <h6 class="fw-bold mb-3">Update Booking Status</h6>
+                <div class="d-flex gap-2 flex-wrap">
+                    @foreach (var st in new[] { "Confirmed", "In Progress", "Completed", "Cancelled" })
+                    {
+                        <form asp-action="UpdateBookingStatus" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.BookingID"/>
+                            <input type="hidden" name="status" value="@st"/>
+                            <button type="submit"
+                                    class="btn rounded-pill px-4 @(Model.BookingStatus == st ? "btn-primary" : "btn-outline-secondary")"
+                                    style="font-size:.88rem;"
+                                    @(Model.BookingStatus == st ? "disabled" : "")>
+                                @st
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Info -->
+    <div class="col-lg-5">
+        <div class="bg-white rounded-3 shadow-sm border p-4 mb-4">
+            <h6 class="fw-bold mb-3">Payment Details</h6>
+            @if (Model.Payment != null)
+            {
+                <table class="w-100" style="font-size:.9rem;">
+                    <tr class="border-bottom"><td class="text-muted py-2">Amount</td><td class="fw-bold text-primary">৳@Model.Payment.Amount.ToString("N0")</td></tr>
+                    <tr class="border-bottom"><td class="text-muted py-2">Method</td><td class="fw-semibold">@Model.Payment.Method</td></tr>
+                    <tr class="border-bottom"><td class="text-muted py-2">Status</td><td>
+                        <span class="status-badge @(Model.Payment.Status == "Paid" ? "status-completed" : "status-pending")">
+                            @Model.Payment.Status
+                        </span>
+                    </td></tr>
+                    <tr><td class="text-muted py-2">Paid At</td><td>@(Model.Payment.PaidAt?.ToString("dd MMM yyyy, HH:mm") ?? "–")</td></tr>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">No payment record found.</p>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,467 @@
+@model WashNGo.ViewModels.SlotMatrixViewModel
+@{
+    ViewData["Title"] = "Weekly Slot Matrix";
+    Layout = "~/Views/Dashboard/_DashboardLayout.cshtml";
+}
+
+<style>
+.matrix-wrap { overflow-x: auto; }
+
+.slot-matrix { border-collapse: separate; border-spacing: 3px; min-width: 780px; width: 100%; }
+
+.slot-matrix th {
+    background: var(--dark);
+    color: #94a3b8;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: .65rem .5rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.slot-matrix th.time-col { background: #1e293b; min-width: 110px; text-align: right; padding-right: 12px; }
+
+.slot-matrix td.time-label {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--gray);
+    text-align: right;
+    padding-right: 12px;
+    white-space: nowrap;
+    background: #f8fafc;
+    border-right: 2px solid var(--border);
+}
+
+.slot-cell {
+    width: 100%;
+    min-width: 90px;
+    height: 48px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .72rem;
+    font-weight: 600;
+    gap: 4px;
+    transition: all .15s ease;
+    position: relative;
+}
+
+.slot-cell.active {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1.5px solid #86efac;
+}
+
+.slot-cell.active:hover { background: #bbf7d0; transform: scale(1.04); }
+
+.slot-cell.inactive {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1.5px solid #fca5a5;
+}
+
+.slot-cell.inactive:hover { background: #fecaca; transform: scale(1.04); }
+
+.slot-cell.not-created {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1.5px dashed #cbd5e1;
+}
+
+.slot-cell.not-created:hover { background: #e2e8f0; border-color: var(--primary); color: var(--primary); }
+
+.slot-cell.loading { opacity: .5; pointer-events: none; }
+
+.slot-cell .capacity {
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    font-size: .62rem;
+    opacity: .7;
+}
+
+.day-header { cursor: pointer; transition: .15s; }
+.day-header:hover { background: #334155 !important; }
+
+.day-header .day-toggle {
+    font-size: .62rem;
+    display: block;
+    opacity: .7;
+    margin-top: 2px;
+}
+
+.time-row-toggle {
+    font-size: .65rem;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: .15s;
+    white-space: nowrap;
+}
+
+.time-row-toggle:hover { background: rgba(14,165,233,.1); }
+
+.legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* Capacity editor tooltip */
+.cap-editor {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: white;
+    padding: 8px 10px;
+    border-radius: 10px;
+    z-index: 200;
+    width: 140px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    font-size: .8rem;
+}
+
+.cap-editor.show { display: block; }
+.cap-editor::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--dark);
+}
+</style>
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h5 class="fw-bold mb-1">
+            <i class="fas fa-calendar-week me-2 text-primary"></i>Weekly Slot Matrix
+        </h5>
+        <p class="text-muted mb-0" style="font-size:.88rem;">
+            Click any cell to instantly activate or deactivate a time slot.
+            Right-click to edit capacity.
+        </p>
+    </div>
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <!-- Legend -->
+        <div class="d-flex align-items-center gap-2" style="font-size:.8rem;">
+            <span class="legend-dot" style="background:#dcfce7;border:1.5px solid #86efac;"></span> Active
+            <span class="legend-dot ms-2" style="background:#fee2e2;border:1.5px solid #fca5a5;"></span> Disabled
+            <span class="legend-dot ms-2" style="background:#f1f5f9;border:1.5px dashed #cbd5e1;"></span> Not Created
+        </div>
+        <!-- Max bookings default -->
+        <div class="d-flex align-items-center gap-2">
+            <label style="font-size:.82rem;color:var(--gray);white-space:nowrap;">Default capacity:</label>
+            <select id="defaultCap" class="form-select form-select-sm" style="width:70px;">
+                @for (int i = 1; i <= 20; i++)
+                {
+                    <option value="@i" selected="@(i == Model.DefaultMaxBookings)">@i</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Matrix -->
+<div class="matrix-wrap">
+    <table class="slot-matrix">
+        <thead>
+            <tr>
+                <th class="time-col">TIME</th>
+                @foreach (var day in Model.Days)
+                {
+                    var daySlots = Model.Matrix.Values
+                        .Where(s => s != null && s!.DayOfWeek == day).ToList();
+                    var activeCount = daySlots.Count(s => s!.IsActive);
+                    var totalCount  = daySlots.Count;
+                    <th class="day-header" data-day="@day"
+                        title="Click to toggle all @SlotMatrixViewModel.DayName(day) slots"
+                        onclick="toggleDay(@day)">
+                        @SlotMatrixViewModel.DayShort(day)
+                        <span class="day-toggle">
+                            @activeCount/@totalCount active
+                        </span>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.TimeRows)
+            {
+                var hour = (int)row.Start.TotalHours;
+                <tr>
+                    <td class="time-label">
+                        <span class="time-row-toggle me-1" onclick="toggleRow(@hour)" title="Toggle all @row.Label slots">
+                            ⟷
+                        </span>
+                        @row.Label
+                    </td>
+                    @foreach (var day in Model.Days)
+                    {
+                        var slot = Model.Matrix.GetValueOrDefault((day, hour));
+                        var state   = slot == null ? "not-created" : (slot.IsActive ? "active" : "inactive");
+                        var icon    = slot == null ? "fa-plus" : (slot.IsActive ? "fa-check" : "fa-times");
+                        var slotId  = slot?.SlotID ?? 0;
+                        var cap     = slot?.MaxBookings ?? Model.DefaultMaxBookings;
+                        <td style="padding:2px;">
+                            <div style="position:relative;">
+                                <button type="button"
+                                    class="slot-cell @state"
+                                    data-day="@day"
+                                    data-hour="@hour"
+                                    data-slot-id="@slotId"
+                                    data-cap="@cap"
+                                    onclick="toggleCell(this)"
+                                    oncontextmenu="openCapEditor(event, this)">
+                                    <i class="fas @icon"></i>
+                                    @if (slot != null)
+                                    {
+                                        <span class="capacity">@cap</span>
+                                    }
+                                </button>
+                                <div class="cap-editor" id="cap-@day-@hour">
+                                    <div class="mb-1 fw-bold" style="font-size:.75rem;">Max Bookings</div>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <input type="number" class="form-control form-control-sm"
+                                               value="@cap" min="1" max="50"
+                                               style="width:60px;padding:2px 6px;"
+                                               id="cap-input-@day-@hour"/>
+                                        <button class="btn btn-sm btn-primary px-2 py-0"
+                                                onclick="saveCapacity(@slotId, @day, @hour)">✓</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Stats bar -->
+<div class="row g-3 mt-3">
+    <div class="col-auto">
+        <div class="bg-white rounded-3 border px-4 py-3 text-center shadow-sm">
+            <div class="fw-bold text-primary" style="font-size:1.4rem;" id="statActive">
+                @Model.Matrix.Values.Count(s => s?.IsActive == true)
+            </div>
+            <div class="text-muted" style="font-size:.8rem;">Active Slots</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="bg-white rounded-3 border px-4 py-3 text-center shadow-sm">
+            <div class="fw-bold text-danger" style="font-size:1.4rem;" id="statInactive">
+                @Model.Matrix.Values.Count(s => s != null && s.IsActive == false)
+            </div>
+            <div class="text-muted" style="font-size:.8rem;">Disabled Slots</div>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="bg-white rounded-3 border px-4 py-3 text-center shadow-sm">
+            <div class="fw-bold text-secondary" style="font-size:1.4rem;" id="statEmpty">
+                @Model.Matrix.Values.Count(s => s == null)
+            </div>
+            <div class="text-muted" style="font-size:.8rem;">Not Created</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+// ── Toggle single cell ────────────────────────────────────
+async function toggleCell(btn) {
+    const day  = parseInt(btn.dataset.day);
+    const hour = parseInt(btn.dataset.hour);
+    const cap  = parseInt(document.getElementById('defaultCap').value);
+
+    btn.classList.add('loading');
+
+    try {
+        const res  = await postJson('/Dashboard/ToggleMatrixSlot', { day, hour, maxBookings: cap });
+        const data = await res.json();
+
+        btn.dataset.slotId = data.slotId;
+        btn.dataset.cap    = data.maxBookings;
+
+        updateCell(btn, data.exists, data.isActive, data.maxBookings);
+        updateStats();
+        updateDayHeader(day);
+    } catch (e) {
+        console.error(e);
+        showToast('Failed to update slot.', 'danger');
+    } finally {
+        btn.classList.remove('loading');
+    }
+}
+
+// ── Toggle full day column ────────────────────────────────
+async function toggleDay(day) {
+    const cells  = document.querySelectorAll(`.slot-cell[data-day="${day}"]`);
+    const anyOff = [...cells].some(c => !c.classList.contains('active'));
+    const activate = anyOff; // if any are off → activate all; else deactivate all
+
+    try {
+        await postJson('/Dashboard/ToggleDaySlots', { day, activate });
+        cells.forEach(c => {
+            if (c.dataset.slotId != '0')
+                updateCell(c, true, activate, parseInt(c.dataset.cap));
+        });
+        updateStats();
+        updateDayHeader(day);
+        showToast(`${activate ? 'Activated' : 'Deactivated'} all slots for ${dayName(day)}.`);
+    } catch (e) {
+        showToast('Failed to toggle day.', 'danger');
+    }
+}
+
+// ── Toggle full time row ──────────────────────────────────
+async function toggleRow(hour) {
+    const cells  = document.querySelectorAll(`.slot-cell[data-hour="${hour}"]`);
+    const anyOff = [...cells].some(c => !c.classList.contains('active'));
+    const activate = anyOff;
+
+    try {
+        await postJson('/Dashboard/ToggleRowSlots', { hour, activate });
+        cells.forEach(c => {
+            if (c.dataset.slotId != '0')
+                updateCell(c, true, activate, parseInt(c.dataset.cap));
+        });
+        updateStats();
+        showToast(`${activate ? 'Activated' : 'Deactivated'} all ${formatHour(hour)} slots.`);
+    } catch (e) {
+        showToast('Failed to toggle row.', 'danger');
+    }
+}
+
+// ── Capacity editor ───────────────────────────────────────
+function openCapEditor(e, btn) {
+    e.preventDefault();
+    document.querySelectorAll('.cap-editor.show').forEach(el => el.classList.remove('show'));
+    const day  = btn.dataset.day;
+    const hour = btn.dataset.hour;
+    const ed   = document.getElementById(`cap-${day}-${hour}`);
+    if (ed) { ed.classList.add('show'); }
+}
+
+document.addEventListener('click', e => {
+    if (!e.target.closest('.cap-editor') && !e.target.closest('.slot-cell'))
+        document.querySelectorAll('.cap-editor.show').forEach(el => el.classList.remove('show'));
+});
+
+async function saveCapacity(slotId, day, hour) {
+    if (!slotId) { showToast('Create the slot first by clicking it.', 'warning'); return; }
+    const input = document.getElementById(`cap-input-${day}-${hour}`);
+    const val   = parseInt(input.value);
+    if (!val || val < 1) return;
+
+    try {
+        await postJson('/Dashboard/UpdateSlotCapacity', { slotId, maxBookings: val });
+        const btn = document.querySelector(`.slot-cell[data-day="${day}"][data-hour="${hour}"]`);
+        if (btn) {
+            btn.dataset.cap = val;
+            const capSpan = btn.querySelector('.capacity');
+            if (capSpan) capSpan.textContent = val;
+        }
+        document.getElementById(`cap-${day}-${hour}`).classList.remove('show');
+        showToast(`Capacity updated to ${val}.`);
+    } catch (e) {
+        showToast('Failed to update capacity.', 'danger');
+    }
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function updateCell(btn, exists, isActive, cap) {
+    btn.classList.remove('active', 'inactive', 'not-created');
+    const icon = btn.querySelector('i');
+
+    if (!exists) {
+        btn.classList.add('not-created');
+        icon.className = 'fas fa-plus';
+        btn.querySelector('.capacity')?.remove();
+    } else if (isActive) {
+        btn.classList.add('active');
+        icon.className = 'fas fa-check';
+        ensureCapSpan(btn, cap);
+    } else {
+        btn.classList.add('inactive');
+        icon.className = 'fas fa-times';
+        ensureCapSpan(btn, cap);
+    }
+}
+
+function ensureCapSpan(btn, cap) {
+    let span = btn.querySelector('.capacity');
+    if (!span) {
+        span = document.createElement('span');
+        span.className = 'capacity';
+        btn.appendChild(span);
+    }
+    span.textContent = cap;
+}
+
+function updateDayHeader(day) {
+    const cells      = document.querySelectorAll(`.slot-cell[data-day="${day}"]`);
+    const active     = [...cells].filter(c => c.classList.contains('active')).length;
+    const total      = [...cells].filter(c => !c.classList.contains('not-created')).length;
+    const headerSpan = document.querySelector(`th[data-day="${day}"] .day-toggle`);
+    if (headerSpan) headerSpan.textContent = `${active}/${total} active`;
+}
+
+function updateStats() {
+    const cells    = document.querySelectorAll('.slot-cell');
+    const active   = [...cells].filter(c => c.classList.contains('active')).length;
+    const inactive = [...cells].filter(c => c.classList.contains('inactive')).length;
+    const empty    = [...cells].filter(c => c.classList.contains('not-created')).length;
+    document.getElementById('statActive')?.setAttribute('data-val', active);
+    document.getElementById('statActive').textContent   = active;
+    document.getElementById('statInactive').textContent = inactive;
+    document.getElementById('statEmpty').textContent    = empty;
+}
+
+function postJson(url, body) {
+    return fetch(url, {
+        method:  'POST',
+        headers: {
+            'Content-Type':           'application/json',
+            'RequestVerificationToken': csrfToken
+        },
+        body: JSON.stringify(body)
+    });
+}
+
+function dayName(d) {
+    return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d] ?? '';
+}
+
+function formatHour(h) {
+    if (h === 0 || h === 24) return '12:00 AM';
+    if (h === 12) return '12:00 PM';
+    return h < 12 ? `${h}:00 AM` : `${h - 12}:00 PM`;
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} shadow position-fixed d-flex align-items-center gap-2`;
+    toast.style.cssText = 'bottom:24px;right:24px;z-index:9999;min-width:260px;border-radius:12px;';
+    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+}

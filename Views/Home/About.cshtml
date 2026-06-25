@@ -1,0 +1,91 @@
+@{
+    ViewData["Title"] = "About Us";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section style="background:linear-gradient(135deg,var(--dark) 0%,var(--dark-2) 100%);padding:4rem 0 3rem;">
+    <div class="container text-center text-white">
+        <span class="hero-badge">About Us</span>
+        <h1 class="hero-title mt-2">We Love Clean Vehicles</h1>
+        <p class="hero-desc mx-auto">WashNGo was built with one mission — making it effortless to keep your vehicle spotless.</p>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="section-tag">Our Story</span>
+                <h2 class="section-title">Professional Wash,<br/>Effortless Booking</h2>
+                <p class="text-muted mb-3">
+                    WashNGo started with a simple idea: vehicle owners shouldn't have to wait in long queues for a wash.
+                    By combining online booking with professional service, we've made it possible to reserve your exact
+                    time slot from anywhere — phone, tablet, or desktop.
+                </p>
+                <p class="text-muted mb-4">
+                    We serve bikes and cars with a team of trained professionals who use only eco-friendly, paint-safe
+                    products. Whether it's a quick rinse or a full interior detail, we've got the right package for you.
+                </p>
+                <div class="row g-3">
+                    @foreach (var item in new[] { ("2,500+","Vehicles Washed"), ("98%","Satisfaction Rate"), ("4.9★","Average Rating"), ("3 yrs","In Business") })
+                    {
+                        <div class="col-6">
+                            <div class="p-3 rounded-3" style="background:var(--light-gray);text-align:center;">
+                                <div style="font-size:1.6rem;font-weight:800;color:var(--primary);">@item.Item1</div>
+                                <div class="text-muted" style="font-size:.88rem;">@item.Item2</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div style="height:420px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:8rem;">
+                    🚗
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section style="background:var(--light-gray);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">Our Values</span>
+            <h2 class="section-title">What Drives Us</h2>
+        </div>
+        <div class="row g-4">
+            @foreach (var v in new[] {
+                ("🌿","Eco-Friendly","We use biodegradable soaps and water-recycling systems to minimise our environmental footprint."),
+                ("🎯","Quality First","Every wash is checked before handover. If it's not perfect, we redo it — no questions asked."),
+                ("⚡","Speed & Convenience","Online booking, real-time slot availability, and zero waiting time when you arrive."),
+                ("🤝","Customer Trust","Transparent pricing, no hidden fees, and honest communication every step of the way.")
+            })
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card h-100">
+                        <div style="font-size:2.5rem;margin-bottom:1rem;">@v.Item1</div>
+                        <h6 class="fw-bold mb-2">@v.Item2</h6>
+                        <p class="text-muted mb-0" style="font-size:.9rem;">@v.Item3</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);" class="py-5">
+    <div class="container text-center text-white">
+        <h2 class="fw-bold mb-3" style="font-size:2rem;">Ready to Experience the Difference?</h2>
+        <p class="mb-4" style="opacity:.9;">Book your first wash today and see why thousands trust WashNGo.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a asp-controller="Booking" asp-action="Create"
+               class="btn btn-light fw-bold px-5 py-3 rounded-pill" style="color:var(--primary-dark);">
+                <i class="fas fa-calendar-plus me-2"></i>Book a Wash
+            </a>
+            <a asp-controller="Services" asp-action="Index"
+               class="btn-outline-custom">
+                <i class="fas fa-th-large me-2"></i>View Services
+            </a>
+        </div>
+    </div>
+</section>
